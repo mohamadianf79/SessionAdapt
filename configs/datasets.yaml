@@ -1,0 +1,11 @@
+# Where to get each raw dataset. Verify the slugs/URLs yourself before the first run.
+yoochoose:
+  source: kaggle
+  kaggle_dataset: chadgostopp/recsys-challenge-2015   # contains yoochoose-clicks.dat
+  dir: data/raw/yoochoose
+  files: [yoochoose-clicks.dat]
+lastfm1k:
+  source: url
+  url: PUT_YOUR_ZENODO_OR_MTG_URL_HERE
+  dir: data/raw/lastfm1k
+  files: [userid-timestamp-artid-artname-traid-traname.tsv]

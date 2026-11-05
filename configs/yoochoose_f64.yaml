@@ -1,0 +1,14 @@
+name: yoochoose_f64
+loader: yoochoose
+raw_path: data/raw/yoochoose/yoochoose-clicks.dat
+recent_fraction: 0.015625   # 1/64 most recent sessions (SR-GNN convention)
+val_frac: 0.10              # chronological share of sessions
+test_frac: 0.10
+min_item_support: 5         # counted on TRAIN only
+min_session_len: 2
+max_session_len: 200
+seed: 0
+eval:
+  max_sessions_val: 5000    # cap used during tuning (speed)
+  max_sessions_test: 20000
+  ks: [20]

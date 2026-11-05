@@ -1,0 +1,14 @@
+name: smoke
+loader: yoochoose
+raw_path: data/raw/fake/yoochoose-clicks.dat
+recent_fraction: 1.0
+val_frac: 0.15
+test_frac: 0.15
+min_item_support: 3
+min_session_len: 2
+max_session_len: 200
+seed: 0
+eval:
+  max_sessions_val: 1000
+  max_sessions_test: 1000
+  ks: [20]

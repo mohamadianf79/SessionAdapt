@@ -19,14 +19,16 @@ class Instances:
         return len(self.target)
 
 
-def make_instances(items, ts, max_sessions=None, seed=0) -> Instances:
+def make_instances(items, ts, max_sessions=None, seed=0, start=1) -> Instances:
+    """start=1: prefixes of length >=1 (default, used in all main tables).
+    start=0: also the empty prefix (predict the FIRST item of a session = pure cold start)."""
     idx = np.arange(len(items))
     if max_sessions is not None and len(idx) > max_sessions:
         idx = np.sort(np.random.default_rng(seed).choice(idx, max_sessions, replace=False))
     P, T, tg, n, s = [], [], [], [], []
     for new_id, i in enumerate(idx):
         a, t = items[i], ts[i]
-        for k in range(1, len(a)):
+        for k in range(start, len(a)):
             P.append(a[:k]); T.append(t[:k]); tg.append(a[k]); n.append(k); s.append(new_id)
     return Instances(P, T, np.array(tg), np.array(n), np.array(s))
 

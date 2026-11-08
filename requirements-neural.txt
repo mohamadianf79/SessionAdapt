@@ -1,0 +1,2 @@
+# Colab already has torch. Locally: pip install torch  (CPU build is enough for a smoke test)
+torch>=2.0

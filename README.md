@@ -36,3 +36,19 @@ notebooks/ plots / exploration only (no logic lives here)
 results/   CSVs written by scripts (commit these)
 docs/      architecture_spec.md  <- fill this in before step 1
 ```
+
+## Step 1c/1d/2/3 commands (after prepare_data + run_baselines)
+```bash
+# --- CPU, local ---
+python scripts/run_adaptive.py configs/yoochoose_f64.yaml [--final]   # detector + score-mixing rules (null result)
+python scripts/run_slots.py    configs/yoochoose_f64.yaml [--final]   # slot-reservation rule (last adaptive rule)
+python scripts/run_curve.py    configs/yoochoose_f64.yaml [--final]   # cold-start / adaptation curve (C1), classical models
+
+# --- GPU, Colab: upload this repo + data/processed/yoochoose_f64/ and results/yoochoose_f64_best_params.json ---
+pip install -r requirements.txt            # torch is preinstalled on Colab
+pytest -q                                  # neural test must pass
+python scripts/train_neural.py configs/yoochoose_f64.yaml --model gru    --trials 8 --final
+python scripts/train_neural.py configs/yoochoose_f64.yaml --model sasrec --trials 8 --final
+python scripts/compare_models.py configs/yoochoose_f64.yaml            # paired neural-vs-Markov table
+```
+Rule: `--final` touches TEST. Run it once per model, after tuning; never tune on its output.

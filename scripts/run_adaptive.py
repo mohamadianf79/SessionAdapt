@@ -13,7 +13,7 @@ from sessrec.eval.protocol import make_instances, ranks_of_targets
 from sessrec.eval.metrics import per_instance, mean_ci, paired_diff_ci
 from sessrec.models.markov import LagMarkov
 from sessrec.models.shift_aware import ShiftAware, CategoryPrior
-from sessrec.analysis.shift import item_category_map, shift_labels
+from sessrec.analysis.shift import item_category_map, shift_labels, cat_valid_from_cfg
 from sessrec.analysis.detector import FEATURES, PrefixStats, prefix_features, ShiftDetector
 
 ap = argparse.ArgumentParser(); ap.add_argument("config"); ap.add_argument("--final", action="store_true")
@@ -24,7 +24,7 @@ n_items = meta["n_items"]
 best = json.load(open(f"results/{cfg['name']}_best_params.json"))["markov"]
 tr_items, _ = to_sessions(data["train"])
 pop_counts = np.bincount(np.concatenate(tr_items), minlength=n_items).astype(float)
-item_cat = item_category_map(data["train"], n_items)
+item_cat = item_category_map(data["train"], n_items, cat_valid_from_cfg(cfg))
 long_m = LagMarkov(**best).fit(tr_items, n_items)
 short_m = LagMarkov(L=1, decay=1.0).fit(tr_items, n_items)
 stats = PrefixStats(long_m.T[0] if long_m.L >= 1 else short_m.T[0], pop_counts, item_cat)

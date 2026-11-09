@@ -14,6 +14,7 @@ class Instances:
     target: np.ndarray
     n: np.ndarray    # prefix length
     sess: np.ndarray # session index (0..S-1) for cluster bootstrap
+    t_next: np.ndarray = None  # timestamp of the target click = 'now' when the recommendation is requested
 
     def __len__(self):
         return len(self.target)
@@ -25,19 +26,20 @@ def make_instances(items, ts, max_sessions=None, seed=0, start=1) -> Instances:
     idx = np.arange(len(items))
     if max_sessions is not None and len(idx) > max_sessions:
         idx = np.sort(np.random.default_rng(seed).choice(idx, max_sessions, replace=False))
-    P, T, tg, n, s = [], [], [], [], []
+    P, T, tg, n, s, tn = [], [], [], [], [], []
     for new_id, i in enumerate(idx):
         a, t = items[i], ts[i]
         for k in range(start, len(a)):
-            P.append(a[:k]); T.append(t[:k]); tg.append(a[k]); n.append(k); s.append(new_id)
-    return Instances(P, T, np.array(tg), np.array(n), np.array(s))
+            P.append(a[:k]); T.append(t[:k]); tg.append(a[k]); n.append(k); s.append(new_id); tn.append(t[k])
+    return Instances(P, T, np.array(tg), np.array(n), np.array(s), np.array(tn))
 
 
 def ranks_of_targets(model, inst: Instances, batch_size=512) -> np.ndarray:
     out = np.empty(len(inst), dtype=np.int64)
     for a in range(0, len(inst), batch_size):
         b = min(a + batch_size, len(inst))
-        S = model.score(inst.items[a:b], inst.ts[a:b])
+        kw = {"t_next": inst.t_next[a:b]} if getattr(model, "uses_t_next", False) else {}
+        S = model.score(inst.items[a:b], inst.ts[a:b], **kw)
         tgt = S[np.arange(b - a), inst.target[a:b]][:, None]
         greater = (S > tgt).sum(1)
         equal = (S == tgt).sum(1) - 1

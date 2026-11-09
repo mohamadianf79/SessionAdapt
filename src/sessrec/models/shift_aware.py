@@ -11,8 +11,9 @@ from ..analysis.detector import prefix_features
 
 
 class CategoryPrior:
-    def __init__(self, train_items, item_cat, pop_counts, n_cat=13, alpha=1.0):
+    def __init__(self, train_items, item_cat, pop_counts, n_cat=None, alpha=1.0):
         self.item_cat = item_cat
+        n_cat = int(item_cat.max()) + 1 if n_cat is None else n_cat
         self.n_cat = n_cat
         C = np.zeros((n_cat, n_cat))
         for s in train_items:

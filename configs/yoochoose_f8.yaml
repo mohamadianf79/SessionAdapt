@@ -1,0 +1,15 @@
+# Longer time slice (~5-6 weeks) so that weekday/weekend effects are testable. Use for the TIME hypothesis only.
+name: yoochoose_f8
+loader: yoochoose
+raw_path: data/raw/yoochoose/yoochoose-clicks.dat
+recent_fraction: 0.125
+val_frac: 0.10
+test_frac: 0.10
+min_item_support: 5
+min_session_len: 2
+max_session_len: 200
+seed: 0
+eval:
+  max_sessions_val: 5000
+  max_sessions_test: 20000
+  ks: [20]

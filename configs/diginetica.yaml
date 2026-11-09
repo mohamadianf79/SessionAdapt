@@ -1,0 +1,16 @@
+name: diginetica
+loader: diginetica
+raw_path: data/raw/diginetica/train-item-views.csv
+recent_fraction: 1.0
+val_frac: 0.10
+test_frac: 0.10
+min_item_support: 5
+min_session_len: 2
+max_session_len: 200
+seed: 0
+cat_valid: null          # categoryId is a real category whenever >= 0 (static item->category map)
+has_clock_time: false    # eventdate has day resolution only -> time hypothesis: --scheme dow7
+eval:
+  max_sessions_val: 5000
+  max_sessions_test: 20000
+  ks: [20]

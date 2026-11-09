@@ -9,3 +9,7 @@ lastfm1k:
   url: PUT_YOUR_ZENODO_OR_MTG_URL_HERE
   dir: data/raw/lastfm1k
   files: [userid-timestamp-artid-artname-traid-traname.tsv]
+diginetica:
+  source: manual           # you downloaded it yourself; put the files here
+  dir: data/raw/diginetica
+  files: [train-item-views.csv, product-categories.csv]

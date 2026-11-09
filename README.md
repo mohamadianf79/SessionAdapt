@@ -1,54 +1,123 @@
-# sessrec — session-based recommendation: protocol + baselines (step 0)
+# sessrec — session-based recommendation: protocol + baselines
 
 ## Setup (VS Code, local or Colab)
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-pip install -e .                   # makes `import sessrec` work everywhere
-pytest -q                          # must be green before you trust any number
+pip install -e .
+pytest -q
 ```
-VS Code: open the folder, `Ctrl+Shift+P` -> "Python: Select Interpreter" -> `.venv`.
+
+VS Code: open the folder, press `Ctrl+Shift+P`, select "Python: Select Interpreter", then choose `.venv`.
 
 ## Pipeline
+
 ```bash
-python scripts/download_data.py yoochoose                # raw file -> data/raw/yoochoose/
-python scripts/prepare_data.py configs/yoochoose_f64.yaml # -> data/processed/yoochoose_f64/
-python scripts/run_baselines.py configs/yoochoose_f64.yaml          # tune on VAL only
-python scripts/run_baselines.py configs/yoochoose_f64.yaml --final  # touch TEST once, at the end
-```
-Smoke test with synthetic data (no download): `pytest -q`.
-
-## Protocol (one place, never change it silently)
-* Chronological split by session start-time quantiles; sessions crossing a boundary are dropped.
-* Item vocabulary from TRAIN only; OOV events removed from val/test and counted in `meta.json`.
-* Every position t>=1 of every eval session is an instance; ranking over the full catalogue.
-* Ties are ranked pessimistically. Metrics: HR@20 (= P@20), MRR@20, NDCG@20.
-* 95% CIs: bootstrap over sessions. Hyper-parameters: VAL only. TEST: once, with `--final`.
-
-## Layout
-```
-configs/   datasets.yaml (sources), <dataset>.yaml (split/eval settings)
-scripts/   download_data, prepare_data, run_baselines, make_fake_yoochoose
-src/sessrec/{data,eval,models}
-tests/     leakage, tie-handling, metrics, end-to-end smoke
-notebooks/ plots / exploration only (no logic lives here)
-results/   CSVs written by scripts (commit these)
-docs/      architecture_spec.md  <- fill this in before step 1
+python scripts/download_data.py yoochoose
+python scripts/prepare_data.py configs/yoochoose_f64.yaml
+python scripts/run_baselines.py configs/yoochoose_f64.yaml
+python scripts/run_baselines.py configs/yoochoose_f64.yaml --final
 ```
 
-## Step 1c/1d/2/3 commands (after prepare_data + run_baselines)
+## Evaluation protocol
+
+- Chronological split by session start-time quantiles; sessions crossing a boundary are dropped.
+- Item vocabulary is built from TRAIN only; OOV events in validation/test are removed and counted.
+- Every position t >= 1 in every evaluation session is an instance.
+- Ranking is over the full catalogue.
+- Ties are ranked pessimistically.
+- Metrics: HR@20, MRR@20, NDCG@20.
+- 95% confidence intervals use session-level bootstrap.
+- Hyperparameters are selected on validation only.
+- TEST is evaluated only for final runs.
+
+## Project layout
+
+```text
+configs/       Dataset and experiment configurations
+scripts/       Data preparation, training, evaluation and analysis
+src/sessrec/   Core package
+tests/         Automated tests
+data/          Raw and processed datasets
+results/       Experiment outputs and tables
+docs/          Project documentation
+```
+
+## Yoochoose experiments
+
+The project includes the following experiments:
+
+- Popularity, session popularity and Markov baselines.
+- Adaptive recommendation experiments.
+- Cold-start and adaptation curves.
+- Time-based controls.
+- Category-prior backoff experiments.
+- GRU and SASRec neural-model experiments.
+
+Useful commands:
+
 ```bash
-# --- CPU, local ---
-python scripts/run_adaptive.py configs/yoochoose_f64.yaml [--final]   # detector + score-mixing rules (null result)
-python scripts/run_slots.py    configs/yoochoose_f64.yaml [--final]   # slot-reservation rule (last adaptive rule)
-python scripts/run_curve.py    configs/yoochoose_f64.yaml [--final]   # cold-start / adaptation curve (C1), classical models
-
-# --- GPU, Colab: upload this repo + data/processed/yoochoose_f64/ and results/yoochoose_f64_best_params.json ---
-pip install -r requirements.txt            # torch is preinstalled on Colab
-pytest -q                                  # neural test must pass
-python scripts/train_neural.py configs/yoochoose_f64.yaml --model gru    --trials 8 --final
-python scripts/train_neural.py configs/yoochoose_f64.yaml --model sasrec --trials 8 --final
-python scripts/compare_models.py configs/yoochoose_f64.yaml            # paired neural-vs-Markov table
+python scripts/run_adaptive.py configs/yoochoose_f64.yaml --final
+python scripts/run_slots.py configs/yoochoose_f64.yaml --final
+python scripts/run_curve.py configs/yoochoose_f64.yaml --final
+python scripts/run_time.py configs/yoochoose_f8.yaml --final
+python scripts/run_backoff.py configs/yoochoose_f64.yaml --final
+python scripts/make_tables.py yoochoose_f64 yoochoose_f8 diginetica
 ```
-Rule: `--final` touches TEST. Run it once per model, after tuning; never tune on its output.
+
+## Diginetica replication
+
+Place `train-item-views.csv` and `product-categories.csv` in `data/raw/diginetica/`.
+
+```bash
+python scripts/prepare_data.py configs/diginetica.yaml
+python scripts/run_baselines.py configs/diginetica.yaml --models pop,spop,markov --final
+python scripts/diagnose_shift.py configs/diginetica.yaml
+python scripts/run_adaptive.py configs/diginetica.yaml --final
+python scripts/run_curve.py configs/diginetica.yaml --final
+python scripts/run_time.py configs/diginetica.yaml --scheme dow7 --final
+python scripts/run_backoff.py configs/diginetica.yaml --final
+```
+
+## Neural models: Diginetica sample experiment
+
+A small CPU proof-of-concept experiment was run on a fixed random sample:
+
+- Train: 5,000 sessions (23,971 events)
+- Validation: 1,000 sessions (4,377 events)
+- Test: 1,000 sessions (4,692 events)
+- Models: GRU and SASRec
+- Training: one trial, one epoch, one seed
+- Device: CPU
+
+Run commands:
+
+```bash
+python scripts/train_neural.py configs/diginetica_sample.yaml --model gru --trials 1 --epochs 1 --patience 1 --seeds 1 --device cpu --final
+python scripts/train_neural.py configs/diginetica_sample.yaml --model sasrec --trials 1 --epochs 1 --patience 1 --seeds 1 --device cpu --final
+python scripts/compare_models.py configs/diginetica_sample.yaml
+```
+
+### Sample test results
+
+| Metric | Markov | GRU | SASRec |
+|---|---:|---:|---:|
+| HR@20 | 0.0737 | 0.0003 | 0.0948 |
+| MRR@20 | 0.0383 | 0.0000 | 0.0941 |
+| NDCG@20 | 0.0466 | 0.0001 | 0.0943 |
+
+Markov parameters were copied from full-dataset tuning and were not retuned on this sample.
+
+These are preliminary sample results, not full-dataset or fully tuned neural results. Both neural models were trained for only one epoch with one seed; conclusions should not be generalized beyond this experiment.
+
+Comparison output: `results/diginetica_sample_neural_vs_markov_test.csv`.
+
+## Testing
+
+Run the automated test suite from the project root:
+
+```bash
+python -m pytest -q
+```

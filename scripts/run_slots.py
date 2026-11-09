@@ -12,7 +12,7 @@ from sessrec.eval.metrics import per_instance, paired_diff_ci
 from sessrec.models.markov import LagMarkov
 from sessrec.models.shift_aware import CategoryPrior
 from sessrec.models.slots import SlotReserve
-from sessrec.analysis.shift import item_category_map, shift_labels
+from sessrec.analysis.shift import item_category_map, shift_labels, cat_valid_from_cfg
 from sessrec.analysis.detector import PrefixStats, prefix_features, ShiftDetector
 
 ap = argparse.ArgumentParser(); ap.add_argument("config"); ap.add_argument("--final", action="store_true")
@@ -23,7 +23,7 @@ n_items = meta["n_items"]
 best = json.load(open(f"results/{cfg['name']}_best_params.json"))["markov"]
 tr_items, _ = to_sessions(data["train"])
 pop_counts = np.bincount(np.concatenate(tr_items), minlength=n_items).astype(float)
-item_cat = item_category_map(data["train"], n_items)
+item_cat = item_category_map(data["train"], n_items, cat_valid_from_cfg(cfg))
 base = LagMarkov(**best).fit(tr_items, n_items)
 stats = PrefixStats(base.T[0], pop_counts, item_cat)
 cp = CategoryPrior(tr_items, item_cat, pop_counts)

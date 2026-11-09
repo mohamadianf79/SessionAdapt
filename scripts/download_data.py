@@ -41,6 +41,8 @@ def main():
                 tarfile.open(target).extractall(folder)
             elif zipfile.is_zipfile(target):
                 zipfile.ZipFile(target).extractall(folder)
+        elif cfg["source"] == "manual":
+            pass   # you placed the files yourself
         else:
             sys.exit(f"unknown source {cfg['source']}")
 

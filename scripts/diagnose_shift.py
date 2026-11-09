@@ -9,7 +9,7 @@ from sessrec.data.prepare import load_processed, to_sessions
 from sessrec.eval.protocol import make_instances, ranks_of_targets
 from sessrec.eval.metrics import per_instance, mean_ci
 from sessrec.models.markov import LagMarkov
-from sessrec.analysis.shift import item_category_map, shift_labels
+from sessrec.analysis.shift import item_category_map, shift_labels, cat_valid_from_cfg
 
 cfg = yaml.safe_load(open(sys.argv[1]))
 data, meta = load_processed(f"data/processed/{cfg['name']}")
@@ -18,7 +18,7 @@ K = cfg["eval"]["ks"][0]
 best = json.load(open(f"results/{cfg['name']}_best_params.json"))["markov"]
 tr_items, _ = to_sessions(data["train"])
 model = LagMarkov(**best).fit(tr_items, meta["n_items"])
-item_cat = item_category_map(data["train"], meta["n_items"])
+item_cat = item_category_map(data["train"], meta["n_items"], cat_valid_from_cfg(cfg))
 print(f"items with a real category: {(item_cat >= 0).mean():.1%}")
 
 it, ts = to_sessions(data["val"])          # VAL only (diagnosis, not a reported result)

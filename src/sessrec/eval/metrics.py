@@ -32,3 +32,11 @@ def mean_ci(vals, sess, n_boot=1000, seed=0, alpha=0.05):
 def paired_diff_ci(a, b, sess, n_boot=1000, seed=0, alpha=0.05):
     """mean(a-b) with a session-level paired bootstrap CI."""
     return mean_ci(np.asarray(a) - np.asarray(b), sess, n_boot, seed, alpha)
+
+
+def verdict(d, lo95, hi95, lo90, hi90, margin):
+    """Pre-specified decision rule. margin = smallest difference that would matter (fixed BEFORE the test run).
+    EQUIVALENT: the 90% CI (= TOST at 5%) lies inside (-margin, +margin)."""
+    sig = "GAIN" if lo95 > 0 else ("LOSS" if hi95 < 0 else "no significant difference")
+    equiv = lo90 > -margin and hi90 < margin
+    return sig + (" | EQUIVALENT within +-%g" % margin if equiv else " | NOT shown equivalent")

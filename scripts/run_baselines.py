@@ -13,7 +13,9 @@ from sessrec.models.sknn import SKNN
 
 ap = argparse.ArgumentParser()
 ap.add_argument("config"); ap.add_argument("--final", action="store_true")
+ap.add_argument("--models", default="pop,spop,markov,sknn", help="comma list; drop sknn on large data")
 a = ap.parse_args()
+WANT = a.models.split(",")
 cfg = yaml.safe_load(open(a.config))
 data, meta = load_processed(f"data/processed/{cfg['name']}")
 n_items = meta["n_items"]
@@ -47,6 +49,8 @@ def evaluate(model, split, cap, seed=0):
 best = {}
 rows = []
 for name, (make, grid) in GRID.items():
+    if name not in WANT:
+        continue
     scored = []
     for p in grid:
         model = make(**p).fit(tr_items, n_items)
@@ -64,6 +68,8 @@ pd.DataFrame(rows).to_csv(f"results/{cfg['name']}_baselines_val.csv", index=Fals
 if a.final:
     rows = []
     for name, (make, _) in GRID.items():
+        if name not in WANT:
+            continue
         model = make(**best[name]).fit(tr_items, n_items)
         r = evaluate(model, "test", cfg["eval"]["max_sessions_test"])
         rows.append({"model": name, "params": json.dumps(best[name]), "split": "test", **r})

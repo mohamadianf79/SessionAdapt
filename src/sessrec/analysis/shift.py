@@ -12,11 +12,25 @@ import numpy as np
 import pandas as pd
 
 
+def cat_valid_from_cfg(cfg):
+    """cfg['cat_valid'] = [lo, hi] -> categories lo..hi are 'real' (Yoochoose: [1, 12]);  null -> every cat >= 0 is real
+    and the item->category mapping is static (Diginetica)."""
+    v = cfg.get("cat_valid", [1, 12])
+    return None if v is None else range(v[0], v[1] + 1)
+
+
 def item_category_map(train_df: pd.DataFrame, n_items: int, valid=range(1, 13)) -> np.ndarray:
-    d = train_df[train_df["cat"].isin(list(valid))]
-    mode = d.groupby("item")["cat"].agg(lambda s: s.value_counts().idxmax())
+    if valid is None:
+        d = train_df[train_df["cat"] >= 0].drop_duplicates("item")
+        mode = d.set_index("item")["cat"]
+    else:
+        d = train_df[train_df["cat"].isin(list(valid))]
+        mode = d.groupby("item")["cat"].agg(lambda s: s.value_counts().idxmax())
     out = np.full(n_items, -1, dtype=np.int64)
     out[mode.index.to_numpy()] = mode.to_numpy()
+    known = out >= 0
+    if known.any():                                   # dense ids 0..C-1 (equality is all that matters)
+        out[known] = np.searchsorted(np.unique(out[known]), out[known])
     return out
 
 

@@ -6,7 +6,7 @@ every n (otherwise the curve mixes different populations of sessions).
 Summary metrics (all with session-bootstrap CIs), c = curve over n=0..N, max = max(c):
   gain_first_click : c[1] - c[0]            (what the first click buys)
   n_q              : first n with c[n] >= q*max(c)   (adaptation speed; q=0.9)
-  adapt_auc        : mean(c)/max(c)         (1 = instantly at full performance, small = slow to adapt)
+  A_adapt        : mean(c)/max(c)         (1 = instantly at full performance, small = slow to adapt)
 """
 from __future__ import annotations
 import numpy as np
@@ -32,8 +32,8 @@ def _matrices(ranks, inst, K, N):
 def _summ(c, q):
     mx = c.max()
     if mx <= 0:
-        return {"gain_first_click": np.nan, "n_q": np.nan, "adapt_auc": np.nan}
-    return {"gain_first_click": c[1] - c[0], "n_q": float(np.argmax(c >= q * mx)), "adapt_auc": c.mean() / mx}
+        return {"gain_first_click": np.nan, "n_q": np.nan, "A_adapt": np.nan}
+    return {"gain_first_click": c[1] - c[0], "n_q": float(np.argmax(c >= q * mx)), "A_adapt": c.mean() / mx}
 
 
 def adaptation_curve(ranks, inst, K=20, N=5, q=0.9, n_boot=300, seed=0):

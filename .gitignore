@@ -9,3 +9,10 @@ results/
 .DS_Store
 
 *.egg-info/
+
+*.zip
+*.7z
+*.7z.*
+
+/data/
+/colab_bundle/

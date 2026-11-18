@@ -24,6 +24,7 @@ ap.add_argument("--model", required=True, choices=list(SPACES))
 ap.add_argument("--trials", type=int, default=8); ap.add_argument("--epochs", type=int, default=30)
 ap.add_argument("--patience", type=int, default=3); ap.add_argument("--seeds", type=int, default=3)
 ap.add_argument("--final", action="store_true"); ap.add_argument("--device", default=None)
+ap.add_argument("--use_best", action="store_true", help="skip the random search; read hp from results/<name>_<model>_best.json (e.g. after a lost Colab session)")
 a = ap.parse_args()
 cfg = yaml.safe_load(open(a.config)); K = cfg["eval"]["ks"][0]
 data, meta = load_processed(f"data/processed/{cfg['name']}")
@@ -37,7 +38,7 @@ tag = f"results/{cfg['name']}_{a.model}"
 keys = list(SPACES[a.model])
 grid = [dict(zip(keys, v)) for v in itertools.product(*SPACES[a.model].values())]
 grid = [g for g in grid if not (a.model == "sasrec" and g["d"] % g["heads"])]
-order = np.random.default_rng(0).permutation(len(grid))[: a.trials]
+order = [] if a.use_best else np.random.default_rng(0).permutation(len(grid))[: a.trials]
 trials = []
 for j, gi in enumerate(order):
     hp = grid[gi]
@@ -46,10 +47,14 @@ for j, gi in enumerate(order):
     m.fit(tr, n_items, val_inst=val_inst)
     trials.append({**hp, "val_MRR": m.best_val, "epochs": m.epochs_run})
     pd.DataFrame(trials).to_csv(f"{tag}_trials.csv", index=False)
-best = max(trials, key=lambda t: t["val_MRR"])
-best_hp = {k: best[k] for k in keys}
-json.dump({"hp": best_hp, "val_MRR": best["val_MRR"], "epochs": best["epochs"]}, open(f"{tag}_best.json", "w"), indent=1)
-print("\nbest on VAL:", best_hp, f"MRR@{K}={best['val_MRR']:.4f}")
+if a.use_best:
+    best_hp = json.load(open(f"{tag}_best.json"))["hp"]
+    print("using hp from", f"{tag}_best.json", best_hp)
+else:
+    best = max(trials, key=lambda t: t["val_MRR"])
+    best_hp = {k: best[k] for k in keys}
+    json.dump({"hp": best_hp, "val_MRR": best["val_MRR"], "epochs": best["epochs"]}, open(f"{tag}_best.json", "w"), indent=1)
+    print("\nbest on VAL:", best_hp, f"MRR@{K}={best['val_MRR']:.4f}")
 
 if a.final:
     tit, tts = to_sessions(data["test"])

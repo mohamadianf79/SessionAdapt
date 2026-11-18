@@ -34,6 +34,6 @@ def test_curve_improves_with_first_click_and_cohort_is_fixed():
     assert hr[1] > hr[0] + 0.2                       # first click buys a lot on Markov data
     assert (c["cohort_sessions"] == len(te)).all()   # all sessions have length 9 >= N+1
     summ = s[s.metric == "HR@5"].set_index("summary")["value"]
-    assert 0 < summ["adapt_auc"] <= 1 and summ["n_q"] >= 1
+    assert 0 < summ["A_adapt"] <= 1 and summ["n_q"] >= 1
     p = population_curve(r, inst, K=5, N=5)
     assert len(p) > 0

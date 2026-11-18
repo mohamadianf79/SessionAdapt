@@ -97,7 +97,9 @@ if a.final:
     rows.append({"model": tm.name, **summarize(tp, tinst, tlab, tb)})
     kn = tlab >= 0
     pr = det.prob(tX)
-    print(f"[TEST] detector AUC (fit on VAL) = {roc_auc_score(tlab[kn], pr[kn]):.4f}")
+    test_auc = roc_auc_score(tlab[kn], pr[kn])
+    print(f"[TEST] detector AUC (fit on VAL) = {test_auc:.4f}")
+    pd.DataFrame([{"detector": "logistic(all features, fit on VAL)", "AUC": test_auc}]).to_csv(f"results/{cfg['name']}_detector_auc_test.csv", index=False)
     out = pd.DataFrame(rows); out.to_csv(f"results/{cfg['name']}_adaptive_test.csv", index=False)
     print(out.T.to_string())
 else:

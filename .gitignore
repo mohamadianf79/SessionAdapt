@@ -1,18 +1,26 @@
-.venv/
+﻿.venv/
 __pycache__/
 .pytest_cache/
 *.py[cod]
-data/raw/
-data/processed/
-results/
+*.egg-info/
 .ipynb_checkpoints/
 .DS_Store
 
-*.egg-info/
+# Raw and processed datasets
+data/raw/
+data/processed/
+/data/
+/colab_bundle/
 
+# Keep final results, but exclude large prediction arrays
+results/preds/
+*.npy
+
+# Exclude temporary and backup results
+results/backup_*/
+results/smoke_*
+
+# Archives
 *.zip
 *.7z
 *.7z.*
-
-/data/
-/colab_bundle/

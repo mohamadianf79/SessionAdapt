@@ -1,0 +1,11 @@
+comparison,metric,base,variant,diff,ci95,ci90,n_inst,verdict
+P1 n=0: timepop[time] vs pop,HR@20,0.09820319615798626,0.07948993955452513,-0.018713256603461126,"[-0.0219,-0.0153]","[-0.0215,-0.0160]",12077,LOSS | NOT shown equivalent
+P2 n>=1: markov+timepop[time] vs markov,MRR@20,0.3135515178686321,0.3134926201348013,-5.889773383081512e-05,"[-0.0002,+0.0001]","[-0.0002,+0.0001]",44162,no significant difference | EQUIVALENT within +-0.003
+P2 n>=1: markov+timepop[time] vs markov,HR@20,0.692790181604094,0.6925863864861193,-0.0002037951179747294,"[-0.0007,+0.0003]","[-0.0006,+0.0002]",44162,no significant difference | EQUIVALENT within +-0.005
+  by n n=1: markov+timepop[time] vs markov,MRR@20,0.3644203418105964,0.3642423533011623,-0.00017798850943423014,"[-0.0006,+0.0002]","[-0.0005,+0.0002]",12077,no significant difference | EQUIVALENT within +-0.003
+  by n n=2-3: markov+timepop[time] vs markov,MRR@20,0.3205939274736736,0.3208403301582467,0.0002464026845731215,"[-0.0001,+0.0006]","[-0.0000,+0.0005]",12478,no significant difference | EQUIVALENT within +-0.003
+  by n n>=4: markov+timepop[time] vs markov,MRR@20,0.27773686117465496,0.27755702299486695,-0.00017983817978796705,"[-0.0004,+0.0000]","[-0.0003,-0.0000]",19607,no significant difference | EQUIVALENT within +-0.003
+P1 n=0: timepop[shuffled] vs pop,HR@20,0.09820319615798626,0.0943943032209986,-0.0038088929369876623,"[-0.0060,-0.0015]","[-0.0057,-0.0017]",12077,LOSS | NOT shown equivalent
+P2 n>=1: markov+timepop[shuffled] vs markov,MRR@20,0.3135515178686321,0.3135905272332398,3.900936460771394e-05,"[-0.0001,+0.0002]","[-0.0001,+0.0002]",44162,no significant difference | EQUIVALENT within +-0.003
+P2 n>=1: markov+timepop[shuffled] vs markov,HR@20,0.692790181604094,0.6929260450160771,0.00013586341198315293,"[-0.0003,+0.0006]","[-0.0002,+0.0006]",44162,no significant difference | EQUIVALENT within +-0.005
+P2 control n>=1: markov+GLOBALpop vs markov,MRR@20,0.3135515178686321,0.3135309862152985,-2.0531653333651818e-05,"[-0.0001,+0.0001]","[-0.0001,+0.0001]",44162,no significant difference | EQUIVALENT within +-0.003

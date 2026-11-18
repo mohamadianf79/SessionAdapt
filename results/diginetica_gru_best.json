@@ -1,0 +1,1 @@
+{"hp": {"emb": 128, "hidden": 256, "dropout": 0.4, "lr": 0.001}, "val_MRR": 0.1508, "epochs": 23}

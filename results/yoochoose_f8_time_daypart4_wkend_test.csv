@@ -1,0 +1,11 @@
+comparison,metric,base,variant,diff,rel_diff,ci95,ci90,n_inst,verdict
+P1 n=0: timepop[time] vs pop,HR@20,0.03405,0.03305,-0.001,-0.029368575624082235,"[-0.0029,+0.0009]","[-0.0026,+0.0006]",20000,no significant difference | EQUIVALENT within +-0.005
+P2 n>=1: markov+timepop[time] vs markov,MRR@20,0.3221320343419626,0.3221768299228808,4.4795580918205576e-05,0.00013905969025934369,"[-0.0001,+0.0002]","[-0.0001,+0.0001]",60391,no significant difference | EQUIVALENT within +-0.003
+P2 n>=1: markov+timepop[time] vs markov,HR@20,0.6694043814475666,0.6691891175837459,-0.000215263863820768,-0.0003215752238658289,"[-0.0005,+0.0001]","[-0.0005,+0.0000]",60391,no significant difference | EQUIVALENT within +-0.005
+  by n n=1: markov+timepop[time] vs markov,MRR@20,0.3712149667218746,0.37137007761717133,0.00015511089529665384,0.000417846555774427,"[-0.0001,+0.0004]","[-0.0001,+0.0004]",20000,no significant difference | EQUIVALENT within +-0.003
+  by n n=2-3: markov+timepop[time] vs markov,MRR@20,0.32564134091428104,0.32568748872619574,4.614781191467931e-05,0.00014171361592208543,"[-0.0001,+0.0002]","[-0.0001,+0.0002]",18331,no significant difference | EQUIVALENT within +-0.003
+  by n n>=4: markov+timepop[time] vs markov,MRR@20,0.2747164520040019,0.27466011004938223,-5.634195461966052e-05,-0.00020509130126229123,"[-0.0002,+0.0001]","[-0.0002,+0.0001]",22060,no significant difference | EQUIVALENT within +-0.003
+P1 n=0: timepop[shuffled] vs pop,HR@20,0.03405,0.03405,0.0,0.0,"[+0.0000,+0.0000]","[+0.0000,+0.0000]",20000,no significant difference | EQUIVALENT within +-0.005
+P2 n>=1: markov+timepop[shuffled] vs markov,MRR@20,0.3221320343419626,0.32222572418698614,9.368984502355562e-05,0.0002908429930445794,"[-0.0000,+0.0002]","[-0.0000,+0.0002]",60391,no significant difference | EQUIVALENT within +-0.003
+P2 n>=1: markov+timepop[shuffled] vs markov,HR@20,0.6694043814475666,0.6695534102763657,0.00014902882879899322,0.00022262900113788155,"[-0.0001,+0.0004]","[-0.0001,+0.0004]",60391,no significant difference | EQUIVALENT within +-0.005
+P2 control n>=1: markov+GLOBALpop vs markov,MRR@20,0.3221320343419626,0.32213612066322866,4.086321266115504e-06,1.2685237202387724e-05,"[-0.0001,+0.0001]","[-0.0000,+0.0001]",60391,no significant difference | EQUIVALENT within +-0.003

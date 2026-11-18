@@ -1,0 +1,1 @@
+{"hp": {"d": 64, "layers": 2, "heads": 1, "dropout": 0.4, "lr": 0.003}, "val_MRR": 0.1891, "epochs": 20}

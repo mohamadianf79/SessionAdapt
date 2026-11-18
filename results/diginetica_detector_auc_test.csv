@@ -1,0 +1,2 @@
+detector,AUC
+"logistic(all features, fit on VAL)",0.6760304877572539

@@ -1,0 +1,8 @@
+detector,AUC
+single:trans_entropy,0.7057184464195483
+single:trans_maxp,0.34211831332567544
+single:cat_changed_in_prefix,0.5802347173972788
+single:log_n,0.521147777775841
+single:log_last_gap,0.49859987066343386
+single:log_last_pop,0.678408249960829
+logistic(all features),0.7189735076956032
